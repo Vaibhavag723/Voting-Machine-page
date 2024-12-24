@@ -104,8 +104,8 @@
         <h1>Voting Machine</h1>
         <nav>
             <a href="#" onclick="showVotingForm()">Vote</a> |
-            <a href="#" onclick="showClines()">Check Clines</a> |
-            <a href="#" onclick="showVoteCount()">Vote Count</a> |
+            <a href="#" onclick="showClines()" id="checkClinesLink">Check Voter</a> |
+            <a href="#" onclick="showVoteCount()" id="voteCountLink">Vote Count</a> |
             <a href="#" onclick="clearData()">Clear Data</a>
         </nav>
     </header>
@@ -124,21 +124,22 @@
             <label for="dob">Date of Birth (DOB):</label>
             <input type="date" id="dob" required>
         </div>
+        <button onclick="submitVote()">Submit</button>
+        <div id="errorMessage" class="message"></div>
+    </div>
+
+    <div id="clines" class="container" style="display: none;">
+        <h2>Voter Choose your party</h2>
         <div class="input-group">
             <label for="party">Choose Party:</label>
-            <select id="party" >
+            <select id="party">
                 <option value="" disabled selected>Select Party</option>
                 <option value="BJP">BJP</option>
                 <option value="Congress">Congress</option>
                 <option value="AAP">AAP</option>
             </select>
         </div>
-        <button onclick="submitVote()">Submit Vote</button>
-        <div id="errorMessage" class="message"></div>
-    </div>
-
-    <div id="clines" class="container" style="display: none;">
-        <h2>Clines Data is Saved</h2>
+        <button onclick="submitVoteForParty()">Submit Vote</button>
         <button onclick="showVotingForm()">Back to Voting</button>
     </div>
 
@@ -154,8 +155,11 @@
     </div>
 
     <script>
-
         let votesData = JSON.parse(localStorage.getItem('votesData')) || {};
+
+        const validVoterIDs = ["1234", "5678", "9876", "4321"];
+        const validNames = ["Vaibhav", "Shivam", "Roy", "Rahul"];
+        const validDOBs = ["2002-11-22", "1999-11-10", "1996-05-20", "1986-06-13"];  // In the format YYYY-MM-DD
 
         function showVotingForm() {
             document.getElementById('votingForm').style.display = 'block';
@@ -164,24 +168,35 @@
         }
 
         function showClines() {
+            if (!hasVoted()) {
+                alert("You must submit a vote before accessing Clines.");
+                return;
+            }
             document.getElementById('votingForm').style.display = 'none';
             document.getElementById('clines').style.display = 'block';
             document.getElementById('voteCount').style.display = 'none';
-            updateVoteCounts();
         }
 
         function showVoteCount() {
+            if (!hasVoted()) {
+                alert("You must submit a vote before accessing Vote Count.");
+                return;
+            }
             document.getElementById('votingForm').style.display = 'none';
             document.getElementById('clines').style.display = 'none';
             document.getElementById('voteCount').style.display = 'block';
             updateVoteCountsDisplay();
         }
 
+        function hasVoted() {
+            const voterID = localStorage.getItem('currentVoterID');
+            return voterID && votesData[voterID];
+        }
+
         function submitVote() {
             const name = document.getElementById('name').value;
             const voterID = document.getElementById('voterID').value;
             const dob = document.getElementById('dob').value;
-            const party = document.getElementById('party').value;
             const errorMessage = document.getElementById('errorMessage');
 
             if (!name || !voterID || !dob) {
@@ -189,66 +204,92 @@
                 return;
             }
 
-            if (votesData[voterID]) {
-
-                const existingVote = votesData[voterID];
-                if (existingVote.name !== name || existingVote.dob !== dob) {
-                    errorMessage.textContent = "Error: Voter ID already used with a different name or DOB.";
-                    return;
-                }
+            if (!validVoterIDs.includes(voterID)) {
+                errorMessage.textContent = "Error: Invalid voter ID.";
+                return;
             }
 
-            votesData[voterID] = { name, dob, party };
+            if (!validNames.includes(name)) {
+                errorMessage.textContent = "Error: Invalid name.";
+                return;
+            }
+
+            if (!validDOBs.includes(dob)) {
+                errorMessage.textContent = "Error: Invalid Date of Birth.";
+                return;
+            }
+
+            if (votesData[voterID]) {
+                errorMessage.textContent = "Error: Voter ID already used.";
+                return;
+            }
+
+            votesData[voterID] = { name, dob, party: null };  
             localStorage.setItem('votesData', JSON.stringify(votesData));
 
+            localStorage.setItem('currentVoterID', voterID);
 
             document.getElementById('name').value = '';
             document.getElementById('voterID').value = '';
             document.getElementById('dob').value = '';
-            document.getElementById('errorMessage').textContent = '';
+            errorMessage.textContent = '';
 
             alert("Vote submitted successfully!");
             showClines();
         }
 
+        function submitVoteForParty() {
+            const voterID = localStorage.getItem('currentVoterID');
+            const party = document.getElementById('party').value;
 
-        function updateVoteCounts() {
-            let bjpCount = 0, congressCount = 0, aapCount = 0;
-            for (let voterID in votesData) {
-                const vote = votesData[voterID];
-                if (vote.party === 'BJP') bjpCount++;
-                else if (vote.party === 'Congress') congressCount++;
-                else if (vote.party === 'AAP') aapCount++;
+            if (!party) {
+                alert("Please select a party.");
+                return;
             }
-            document.getElementById('bjpVotes').textContent = bjpCount;
-            document.getElementById('congressVotes').textContent = congressCount;
-            document.getElementById('aapVotes').textContent = aapCount;
-        }
 
+            votesData[voterID].party = party;
+            localStorage.setItem('votesData', JSON.stringify(votesData));
+
+            alert("Your party vote has been recorded.");
+            showVoteCount();
+        }
 
         function updateVoteCountsDisplay() {
             let bjpCount = 0, congressCount = 0, aapCount = 0;
+
             for (let voterID in votesData) {
                 const vote = votesData[voterID];
                 if (vote.party === 'BJP') bjpCount++;
                 else if (vote.party === 'Congress') congressCount++;
                 else if (vote.party === 'AAP') aapCount++;
             }
+
             document.getElementById('bjpVotesCount').textContent = bjpCount;
             document.getElementById('congressVotesCount').textContent = congressCount;
             document.getElementById('aapVotesCount').textContent = aapCount;
         }
 
-
         function clearData() {
             if (confirm("Are you sure you want to clear all vote data? This action cannot be undone.")) {
                 localStorage.removeItem('votesData');
+                localStorage.removeItem('currentVoterID');
                 votesData = {};
-                updateVoteCounts();
                 updateVoteCountsDisplay();
                 alert("All vote data has been cleared.");
             }
         }
+
+        window.onload = function() {
+            const hasVoted = localStorage.getItem('currentVoterID') && votesData[localStorage.getItem('currentVoterID')];
+            if (!hasVoted) {
+                document.getElementById('checkClinesLink').style.pointerEvents = 'none';
+                document.getElementById('voteCountLink').style.pointerEvents = 'none';
+            } else {
+                document.getElementById('checkClinesLink').style.pointerEvents = 'auto';
+                document.getElementById('voteCountLink').style.pointerEvents = 'auto';
+            }
+        }
+
     </script>
 
 </body>
