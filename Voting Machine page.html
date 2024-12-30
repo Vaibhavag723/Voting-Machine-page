@@ -1,297 +1,462 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Voting Machine</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
+        * {
             margin: 0;
             padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f2f5;
+            color: #333;
+            line-height: 1.5;
         }
 
         header {
-            background-color: #333;
+            background-color: #4CAF50;
             color: white;
-            padding: 10px 0;
+            padding: 15px 0;
             text-align: center;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            position: relative; 
         }
 
-        nav {
-            margin-top: 0px;
+        header img {
+            position: absolute; 
+            left: 20px; 
+            top: 50%; 
+            transform: translateY(-50%); 
+            width: 40px; 
+            height: auto;
         }
 
-        nav a {
+        header nav ul {
+            list-style: none;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        header nav ul li {
+            font-size: 18px;
+        }
+
+        header nav ul li a {
             color: white;
-            margin: 0 15px;
             text-decoration: none;
-            font-weight: bold;
+            padding: 10px 15px;
+            transition: background-color 0.3s ease;
+            border-radius: 4px;
         }
 
-        nav a:hover {
-            color: #4CAF50;
+        header nav ul li a:hover {
+            background-color: #45a049;
         }
 
         .container {
-            width: 50%;
-            margin: 20px auto;
+            max-width: 900px;
+            margin: 10px auto;
             padding: 20px;
             background-color: white;
             border-radius: 8px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
         }
 
-        .input-group {
-            margin: 15px 0;
+        h2 {
+            text-align: center;
+            font-size: 24px;
+            margin-bottom: 20px;
+            color: #333;
         }
 
-        .input-group label {
-            font-weight: Time New Roman;
+        h3 {
+            font-size: 22px;
+            color: #333;
+            margin-bottom: 15px;
         }
 
-        .input-group input,
-        .input-group select {
-            width: 100%;
-            padding: 8px;
-            margin-top: 5px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
+        img {
+            width: 20px;
+            height: 20px;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+        }
+
+        label {
+            font-size: 16px;
+            color: #555;
+        }
+
+        input, select, button {
+            padding: 12px;
+            font-size: 16px;
+            border-radius: 10px;
+            border: 1px solid #ddd;
+            transition: border-color 0.3s ease;
+        }
+
+        input:focus, select:focus {
+            border-color: #4CAF50;
+            outline: none;
         }
 
         button {
-            background-color: #23a327;
+            background-color: #4CAF50;
             color: white;
-            border: none;
-            padding: 10px 20px;
             cursor: pointer;
-            border-radius: 5px;
+            font-weight: bold;
+            border: none;
+            transition: background-color 0.3s ease;
         }
 
         button:hover {
-            background-color: #53bd58;
+            background-color: #45a049;
         }
 
-        .message {
-            color: red;
-            margin: 10px 0;
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            text-align: left;
         }
 
-        .clear-btn {
-            background-color: #f44336;
+        th, td {
+            padding: 12px;
+            border: 1px solid #ddd;
         }
 
-        .clear-btn:hover {
-            background-color: #e53935;
+        th {
+            background-color: #f9f9f9;
+            color: #555;
         }
 
-        #voteCounts {
-            font-size: 20px;
-            font-weight: bold;
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
         }
 
-        #voteCounts p {
-            margin: 10px 0;
+        tr:hover {
+            background-color: #f1f1f1;
+        }
+
+        .tab {
+            display: none;
+        }
+
+        .tab.active {
+            display: block;
+        }
+
+        .tab-button {
+            display: inline-block;
+            margin-top: 10px;
+            background-color: #007bff;
+            color: white;
+            padding: 10px 20px;
+            font-size: 16px;
+            text-align: center;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: background-color 0.3s ease;
+        }
+
+        .tab-button:hover {
+            background-color: #0056b3;
+        }
+
+        @media screen and (max-width: 768px) {
+            header nav ul {
+                flex-direction: column;
+            }
+
+            header nav ul li {
+                margin: 10px 0;
+            }
+
+            .container {
+                padding: 15px;
+                width: 95%;
+            }
+
+            table, th, td {
+                font-size: 14px;
+                padding: 8px;
+            }
         }
     </style>
 </head>
-
 <body>
 
     <header>
-        <h1>Voting Machine</h1>
+        <img src="c:\Users\vaibhav.aggarwal\Downloads\Election logo.jpg" alt="Logo">
+        
         <nav>
-            <a href="#" onclick="showVotingForm()">Vote</a> |
-            <a href="#" onclick="showClines()" id="checkClinesLink">Check Voter</a> |
-            <a href="#" onclick="showVoteCount()" id="voteCountLink">Vote Count</a> |
-            <a href="#" onclick="clearData()">Clear Data</a>
+            <ul>
+                <li><a href="javascript:void(0);" onclick="showRegisterTab()">Register</a></li>
+                <li><a href="javascript:void(0);" onclick="showVoteTab()">Vote</a></li>
+                <li><a href="javascript:void(0);" onclick="showClientsTab()">View All Clients</a></li>
+                <li><a href="javascript:void(0);" onclick="showResultsTab()">Vote Results</a></li>
+            </ul>
         </nav>
     </header>
 
-    <div id="votingForm" class="container">
-        <h2>Vote for your Party</h2>
-        <div class="input-group">
-            <label for="name">Name:</label>
-            <input type="text" id="name" placeholder="Enter your name" required>
-        </div>
-        <div class="input-group">
-            <label for="voterID">Voter ID:</label>
-            <input type="text" id="voterID" placeholder="Enter your four digit voter ID" required>
-        </div>
-        <div class="input-group">
-            <label for="dob">Date of Birth (DOB):</label>
-            <input type="date" id="dob" required>
-        </div>
-        <button onclick="submitVote()">Submit</button>
-        <div id="errorMessage" class="message"></div>
-    </div>
+    <div class="container">
+        <h2>Voter Registration and Voting</h2>
 
-    <div id="clines" class="container" style="display: none;">
-        <h2>Voter Choose your party</h2>
-        <div class="input-group">
-            <label for="party">Choose Party:</label>
-            <select id="party">
-                <option value="" disabled selected>Select Party</option>
-                <option value="BJP">BJP</option>
-                <option value="Congress">Congress</option>
-                <option value="AAP">AAP</option>
-            </select>
-        </div>
-        <button onclick="submitVoteForParty()">Submit Vote</button>
-        <button onclick="showVotingForm()">Back to Voting</button>
-    </div>
+        <div id="registerTab" class="tab">
+            <h3>Register to Vote</h3>
+            <form id="registerForm">
+                <label for="registerName">Voter Name:</label>
+                <input type="text" id="registerName" required><br>
 
-    <div id="voteCount" class="container" style="display: none;">
-        <h2>Total Vote Count</h2>
-        <div id="voteCountsSummary">
-            <p>BJP: <span id="bjpVotesCount">0</span></p>
-            <p>Congress: <span id="congressVotesCount">0</span></p>
-            <p>AAP: <span id="aapVotesCount">0</span></p>
+                <label for="registerId">Voter ID:</label>
+                <input type="text" id="registerId" required><br>
+
+                <label for="registerDob">Date of Birth:</label>
+                <input type="date" id="registerDob" required><br>
+
+                <button type="submit">Register</button>
+            </form>
         </div>
-        <button onclick="showVotingForm()">Back to Voting</button>
-        <button onclick="showClines()">Back to Clines</button>
+
+        <div id="voteTab" class="tab">
+            <h3>Enter Your Details</h3>
+            <form id="voteForm">
+                <label for="voterName">Voter Name:</label>
+                <input type="text" id="voterName" required><br>
+
+                <label for="voterId">Voter ID:</label>
+                <input type="text" id="voterId" required><br>
+
+                <label for="dob">Date of Birth:</label>
+                <input type="date" id="dob" required><br>
+
+                <button type="submit">Next</button>
+            </form>
+        </div>
+
+        <div id="partySelection" class="tab" style="display:none;">
+            <h3>Select Your Party</h3>
+            <form id="partyForm">
+                <label for="party">Choose Party:</label>
+                <select id="party" required>
+                    <option value="" disabled selected hidden>Choose your party</option>
+                    <option value="BJP">BJP</option>
+                    <option value="Congress">Congress</option>
+                    <option value="APP">APP</option>
+                </select><br>
+                <button type="submit">Vote</button>
+            </form>
+        </div>
+
+        <div id="clientsTab" class="tab" style="display:none;">
+            <h3>All Voters Data</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>UID</th>
+                        <th>Name</th>
+                        <th>Voter ID</th>
+                        <th>DOB</th>
+                        <th>Party Voted</th>
+                        <th>Time</th>
+                    </tr>
+                </thead>
+                <tbody id="clientTableBody">
+                </tbody>
+            </table>
+        </div>
+
+        <div id="resultsTab" class="tab" style="display:none;">
+            <h3>Vote Results</h3>
+            <p><strong><img src="c:\Users\vaibhav.aggarwal\Downloads\71eb2cc75e9615acd590e8b8e3967707.jpg">BJP: </strong><span id="bjpVotes">0</span></p>
+            <p><strong><img src="c:\Users\vaibhav.aggarwal\Downloads\Indian_National_Congress_hand_logo.png">Congress: </strong><span id="congressVotes">0</span></p>
+            <p><strong><img src="c:\Users\vaibhav.aggarwal\Downloads\1449.png">APP: </strong><span id="appVotes">0</span></p>
+        </div>
     </div>
 
     <script>
-        let votesData = JSON.parse(localStorage.getItem('votesData')) || {};
+        document.getElementById("registerForm").addEventListener("submit", function(event) {
+            event.preventDefault();
 
-        const validVoterIDs = ["1234", "5678", "9876", "4321"];
-        const validNames = ["Vaibhav", "Shivam", "Roy", "Rahul"];
-        const validDOBs = ["2002-11-22", "1999-11-10", "1996-05-20", "1986-06-13"];  // In the format YYYY-MM-DD
+            const registerName = document.getElementById("registerName").value;
+            const registerId = document.getElementById("registerId").value;
+            const registerDob = document.getElementById("registerDob").value;
 
-        function showVotingForm() {
-            document.getElementById('votingForm').style.display = 'block';
-            document.getElementById('clines').style.display = 'none';
-            document.getElementById('voteCount').style.display = 'none';
-        }
+            const existingVoters = JSON.parse(localStorage.getItem("voters")) || [];
 
-        function showClines() {
-            if (!hasVoted()) {
-                alert("You must submit a vote before accessing Clines.");
-                return;
-            }
-            document.getElementById('votingForm').style.display = 'none';
-            document.getElementById('clines').style.display = 'block';
-            document.getElementById('voteCount').style.display = 'none';
-        }
-
-        function showVoteCount() {
-            if (!hasVoted()) {
-                alert("You must submit a vote before accessing Vote Count.");
-                return;
-            }
-            document.getElementById('votingForm').style.display = 'none';
-            document.getElementById('clines').style.display = 'none';
-            document.getElementById('voteCount').style.display = 'block';
-            updateVoteCountsDisplay();
-        }
-
-        function hasVoted() {
-            const voterID = localStorage.getItem('currentVoterID');
-            return voterID && votesData[voterID];
-        }
-
-        function submitVote() {
-            const name = document.getElementById('name').value;
-            const voterID = document.getElementById('voterID').value;
-            const dob = document.getElementById('dob').value;
-            const errorMessage = document.getElementById('errorMessage');
-
-            if (!name || !voterID || !dob) {
-                errorMessage.textContent = "Please fill out all fields.";
+            const existingVoter = existingVoters.find(voter => voter.voterId === registerId);
+            if (existingVoter) {
+                alert("This Voter ID is already registered.");
                 return;
             }
 
-            if (!validVoterIDs.includes(voterID)) {
-                errorMessage.textContent = "Error: Invalid voter ID.";
+            const voterData = {
+                voterName: registerName,
+                voterId: registerId,
+                dob: registerDob,
+                partyVoted: null,
+                time: null
+            };
+
+            existingVoters.push(voterData);
+            localStorage.setItem("voters", JSON.stringify(existingVoters));
+
+            alert("Registration successful!");
+            hideAllTabs();
+            document.getElementById("voteTab").style.display = "block";
+        });
+
+        document.getElementById("voteForm").addEventListener("submit", function(event) {
+            event.preventDefault();
+
+            const voterName = document.getElementById("voterName").value;
+            const voterId = document.getElementById("voterId").value;
+            const dob = document.getElementById("dob").value;
+
+            const existingVoters = JSON.parse(localStorage.getItem("voters")) || [];
+
+            const voterData = existingVoters.find(voter => voter.voterId === voterId);
+
+            if (!voterData) {
+                alert("Voter not found");
                 return;
             }
 
-            if (!validNames.includes(name)) {
-                errorMessage.textContent = "Error: Invalid name.";
+            if (voterData.dob !== dob) {
+                alert("DOB does not match");
                 return;
             }
 
-            if (!validDOBs.includes(dob)) {
-                errorMessage.textContent = "Error: Invalid Date of Birth.";
+            if (voterData.partyVoted) {
+                alert("You have already voted. You cannot vote again.");
                 return;
             }
 
-            if (votesData[voterID]) {
-                errorMessage.textContent = "Error: Voter ID already used.";
-                return;
-            }
+            document.getElementById("voteTab").style.display = "none";
+            document.getElementById("partySelection").style.display = "block";
+        });
 
-            votesData[voterID] = { name, dob, party: null };  
-            localStorage.setItem('votesData', JSON.stringify(votesData));
+        document.getElementById("partyForm").addEventListener("submit", function(event) {
+            event.preventDefault();
 
-            localStorage.setItem('currentVoterID', voterID);
+            const voterId = document.getElementById("voterId").value;
+            const party = document.getElementById("party").value;
 
-            document.getElementById('name').value = '';
-            document.getElementById('voterID').value = '';
-            document.getElementById('dob').value = '';
-            errorMessage.textContent = '';
+            const existingVoters = JSON.parse(localStorage.getItem("voters")) || [];
+
+            const voterData = existingVoters.find(voter => voter.voterId === voterId);
+            voterData.partyVoted = party;
+            voterData.time = new Date().toLocaleString();
+
+            localStorage.setItem("voters", JSON.stringify(existingVoters));
+
+            addVoterToClientsTable(voterData);
+
+            updateVoteResults();
 
             alert("Vote submitted successfully!");
-            showClines();
+            hideAllTabs();
+            document.getElementById("voteTab").style.display = "block";
+        });
+
+        function addVoterToClientsTable(voterData) {
+            const clientTableBody = document.getElementById("clientTableBody");
+
+            const row = document.createElement("tr");
+            row.innerHTML = `
+                <td>${voterData.voterId}</td>
+                <td>${voterData.voterName}</td>
+                <td>${voterData.voterId}</td>
+                <td>${voterData.dob}</td>
+                <td>${voterData.partyVoted || "Not Voted"}</td>
+                <td>${voterData.time || "Not Voted"}</td>
+            `;
+
+            clientTableBody.appendChild(row);
         }
 
-        function submitVoteForParty() {
-            const voterID = localStorage.getItem('currentVoterID');
-            const party = document.getElementById('party').value;
+        function updateVoteResults() {
+            let bjpVotes = 0;
+            let congressVotes = 0;
+            let appVotes = 0;
 
-            if (!party) {
-                alert("Please select a party.");
-                return;
-            }
+            const existingVoters = JSON.parse(localStorage.getItem("voters")) || [];
 
-            votesData[voterID].party = party;
-            localStorage.setItem('votesData', JSON.stringify(votesData));
+            existingVoters.forEach(voterData => {
+                if (voterData.partyVoted === "BJP") {
+                    bjpVotes++;
+                } else if (voterData.partyVoted === "Congress") {
+                    congressVotes++;
+                } else if (voterData.partyVoted === "APP") {
+                    appVotes++;
+                }
+            });
 
-            alert("Your party vote has been recorded.");
-            showVoteCount();
+            document.getElementById("bjpVotes").textContent = bjpVotes;
+            document.getElementById("congressVotes").textContent = congressVotes;
+            document.getElementById("appVotes").textContent = appVotes;
         }
 
-        function updateVoteCountsDisplay() {
-            let bjpCount = 0, congressCount = 0, aapCount = 0;
-
-            for (let voterID in votesData) {
-                const vote = votesData[voterID];
-                if (vote.party === 'BJP') bjpCount++;
-                else if (vote.party === 'Congress') congressCount++;
-                else if (vote.party === 'AAP') aapCount++;
-            }
-
-            document.getElementById('bjpVotesCount').textContent = bjpCount;
-            document.getElementById('congressVotesCount').textContent = congressCount;
-            document.getElementById('aapVotesCount').textContent = aapCount;
+        function showRegisterTab() {
+            hideAllTabs();
+            document.getElementById("registerTab").style.display = "block";
         }
 
-        function clearData() {
-            if (confirm("Are you sure you want to clear all vote data? This action cannot be undone.")) {
-                localStorage.removeItem('votesData');
-                localStorage.removeItem('currentVoterID');
-                votesData = {};
-                updateVoteCountsDisplay();
-                alert("All vote data has been cleared.");
-            }
+        function showVoteTab() {
+            hideAllTabs();
+            document.getElementById("voteTab").style.display = "block";
         }
 
-        window.onload = function() {
-            const hasVoted = localStorage.getItem('currentVoterID') && votesData[localStorage.getItem('currentVoterID')];
-            if (!hasVoted) {
-                document.getElementById('checkClinesLink').style.pointerEvents = 'none';
-                document.getElementById('voteCountLink').style.pointerEvents = 'none';
-            } else {
-                document.getElementById('checkClinesLink').style.pointerEvents = 'auto';
-                document.getElementById('voteCountLink').style.pointerEvents = 'auto';
-            }
+        function showClientsTab() {
+            hideAllTabs();
+            document.getElementById("clientsTab").style.display = "block";
+            displayClients();
         }
 
+        function showResultsTab() {
+            hideAllTabs();
+            document.getElementById("resultsTab").style.display = "block";
+        }
+
+        function displayClients() {
+            const clientTableBody = document.getElementById("clientTableBody");
+            clientTableBody.innerHTML = "";
+
+            const existingVoters = JSON.parse(localStorage.getItem("voters")) || [];
+
+            existingVoters.forEach((voterData, index) => {
+                const row = document.createElement("tr");
+                row.innerHTML = `
+                    <td>${index + 1}</td>
+                    <td>${voterData.voterName}</td>
+                    <td>${voterData.voterId}</td>
+                    <td>${voterData.dob}</td>
+                    <td>${voterData.partyVoted || "Not Voted"}</td>
+                    <td>${voterData.time || "Not Voted"}</td>
+                `;
+                clientTableBody.appendChild(row);
+            });
+        }
+
+        function hideAllTabs() {
+            document.getElementById("registerTab").style.display = "none";
+            document.getElementById("voteTab").style.display = "none";
+            document.getElementById("partySelection").style.display = "none";
+            document.getElementById("clientsTab").style.display = "none";
+            document.getElementById("resultsTab").style.display = "none";
+        }
     </script>
 
 </body>
-
 </html>
